@@ -1,13 +1,16 @@
+import { useState, useEffect } from 'react';
 import { RouterProvider, createBrowserRouter } from "react-router-dom"
 import { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
+import { auth } from './firebase';
 
-import Layout from './components/Layout'
-import Home from './routes/Home'
-import Profile from './routes/Profile'
-import Login from './routes/Login'
-import Signup from './routes/Signup'
-import NotFound from './routes/NotFound'
+import LoadingScreen from "./components/loading-screen";
+import Layout from './components/Layout';
+import Home from './routes/Home';
+import Profile from './routes/Profile';
+import Login from './routes/Login';
+import Signup from './routes/Signup';
+import NotFound from './routes/NotFound';
 
 const router = createBrowserRouter([
   {
@@ -46,13 +49,24 @@ const GlobalStyle = createGlobalStyle`
 `
 
 function App() {
+  const [isLoading, setLoading] = useState(true);
+
+  const init = async () => {
+    // firebase 대기
+    await auth.authStateReady();
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    init();
+  }, []);
 
   return (
     <>
       <GlobalStyle />
-     <RouterProvider router={router} />
+      {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
     </>
-  )
+  );
 }
 
 export default App
