@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { Input } from './Input';
+// import { Input } from "../components/auth-components";
+import { Inputs as Input } from './Input';
 
 const meta = {
   title: 'Example/Input',
