@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { RouterProvider, createBrowserRouter } from "react-router-dom"
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle, styled } from "styled-components";
 import reset from "styled-reset";
 import { auth } from './firebase';
 
@@ -9,13 +9,19 @@ import Layout from './components/Layout';
 import Home from './routes/Home';
 import Profile from './routes/Profile';
 import Login from './routes/Login';
-import Signup from './routes/Signup';
+import CreateAccount from './routes/CreateAccount';
 import NotFound from './routes/NotFound';
+import ProtectedRoute from './components/protected-route'
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: (
+      // Home, Profile은 로그인 여부에 따라 Login 페이지로 이동
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         path: "",
@@ -32,8 +38,8 @@ const router = createBrowserRouter([
     element: <Login />
   },
   {
-    path: "/signup",
-    element: <Signup />
+    path: "/create-account",
+    element: <CreateAccount />
   },
   {
     path: "/*",
@@ -47,6 +53,12 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
   }
 `
+
+const Wrapper = styled.div`
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+`;
 
 function App() {
   const [isLoading, setLoading] = useState(true);
@@ -62,10 +74,10 @@ function App() {
   }, []);
 
   return (
-    <>
+    <Wrapper>
       <GlobalStyle />
       {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
-    </>
+    </Wrapper>
   );
 }
 
