@@ -1,9 +1,12 @@
-const Home = () => {
-  
+import { styled } from "styled-components";
+import PostTweetForm from "../components/post-write-form";
+
+const Wrapper = styled.div``;
+
+export default function Home() {
   return (
-    <h1>
-      Home
-    </h1>
+    <Wrapper>
+      <PostTweetForm />
+    </Wrapper>
   );
 }
-export default Home
