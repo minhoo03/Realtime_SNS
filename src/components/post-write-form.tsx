@@ -55,13 +55,13 @@ const SubmitBtn = styled.input`
   }
 `;
 
-export default function PostTweetForm() {
+export default function PostWriteForm() {
   const [isLoading, setLoading] = useState(false);
-  const [tweet, setTweet] = useState("");
+  const [feed, setFeed] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTweet(e.target.value);
+    setFeed(e.target.value);
   };
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +77,7 @@ export default function PostTweetForm() {
         rows={5}
         maxLength={180}
         onChange={onChange}
-        value={tweet}
+        value={feed}
         placeholder="What is happening?!"
       />
       <AttachFileButton htmlFor="file">
@@ -91,7 +91,7 @@ export default function PostTweetForm() {
       />
       <SubmitBtn
         type="submit"
-        value={isLoading ? "Posting..." : "Post Tweet"}
+        value={isLoading ? "Posting..." : "Post Feed"}
       />
     </Form>
   );
