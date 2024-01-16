@@ -1,5 +1,7 @@
+import { addDoc, collection } from "firebase/firestore";
 import { useState } from "react";
 import { styled } from "styled-components";
+import { auth, db } from "../firebase";
 
 const Form = styled.form`
   display: flex;
@@ -71,8 +73,29 @@ export default function PostWriteForm() {
     }
   };
   
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    // 폼 입력 데이터가 있는 경우 (조건 적합)
+    if (!user || isLoading || feed === "" || feed.length > 180) return;
+    try {
+      setLoading(true);
+      // firebase SDK의 addDoc: 새로운 Document 생성
+      // db 인스턴스, feeds 콜렉션, [추가할 데이터]
+      await addDoc(collection(db, "feeds"), {
+        feed,
+        createdAt: Date.now(),
+        username: user.displayName || "Anonymous",
+        userId: user.uid,
+      });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
-    <Form>
+    <Form onSubmit={onSubmit}>
       <TextArea
         rows={5}
         maxLength={180}
