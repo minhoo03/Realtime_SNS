@@ -1,7 +1,9 @@
-import { addDoc, collection } from "firebase/firestore";
+// post-write-form
+import { addDoc, collection, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import { styled } from "styled-components";
-import { auth, db } from "../firebase";
+import { auth, db, storage } from "../firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const Form = styled.form`
   display: flex;
@@ -82,12 +84,29 @@ export default function PostWriteForm() {
       setLoading(true);
       // firebase SDK의 addDoc: 새로운 Document 생성
       // db 인스턴스, feeds 콜렉션, [추가할 데이터]
-      await addDoc(collection(db, "feeds"), {
+      const doc = await addDoc(collection(db, "feeds"), {
         feed,
         createdAt: Date.now(),
         username: user.displayName || "Anonymous",
         userId: user.uid,
       });
+
+      // 파일 유무
+      if (file) {
+        const locationRef = ref( // 업로드 된 파일이 저장되는 폴더 명과 파일 명 지정
+          storage, // 인스턴스
+          `feeds/${user.uid}-${user.displayName}/${doc.id}` // feeds폴더/유저폴더/파일명
+        );
+        const result = await uploadBytes(locationRef, file); // 어떤 파일을 어디에 저장할 것인지 // promise 반환 -> 업로드 결과에 대한 참조가 있다
+        const url = await getDownloadURL(result.ref); // 업로드한 이미지 URL 
+        await updateDoc(doc, { // 생성한 doc에 photo 업데이트
+          photo: url,
+        });
+      }
+      // 리셋
+      setFeed(""); 
+      setFile(null);
+
     } catch (e) {
       console.log(e);
     } finally {
@@ -97,6 +116,7 @@ export default function PostWriteForm() {
   return (
     <Form onSubmit={onSubmit}>
       <TextArea
+        required // 빈 값 허용하지 않음
         rows={5}
         maxLength={180}
         onChange={onChange}
