@@ -1,5 +1,10 @@
-// component/timeline.tsx
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+// Timeline.tsx
+import {
+    collection,
+    onSnapshot,
+    orderBy,
+    query,
+  } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import { db } from "../firebase";
@@ -15,7 +20,11 @@ export interface IFeed {
   createdAt: number;
 }
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+`;
 
 export default function Timeline() {
   const [feeds, setFeed] = useState<IFeed[]>([]);
@@ -25,19 +34,35 @@ export default function Timeline() {
       orderBy("createdAt", "desc") // 최신 순으로 (내림차)
     );
     // 스냅샷: 특정 시간에 저장 장치의 상태
-    const spanshot = await getDocs(feedsQuery); // 해당 쿼리대로 getDocs
-    const feeds = spanshot.docs.map((doc) => { // 쿼리의 스냅샷에 담긴 각 문서 출력 (각 feed)
-      const { feed, createdAt, userId, username, photo } = doc.data();
-      return {
-        feed,
-        createdAt,
-        userId,
-        username,
-        photo,
-        id: doc.id,
-      };
-    });
-    setFeed(feeds); // 얻은 데이터 객체를 setState
+    // const spanshot = await getDocs(feedsQuery); // 해당 쿼리대로 getDocs
+    // const feeds = spanshot.docs.map((doc) => { // 쿼리의 스냅샷에 담긴 각 문서 출력 (각 feed)
+    //   const { feed, createdAt, userId, username, photo } = doc.data();
+    //   return {
+    //     feed,
+    //     createdAt,
+    //     userId,
+    //     username,
+    //     photo,
+    //     id: doc.id,
+    //   };
+    // });
+
+    await onSnapshot(feedsQuery, (snapshot) => {
+        const feeds = snapshot.docs.map((doc) => {
+            const { feed, createdAt, userId, username, photo } = doc.data();
+
+            return {
+                feed,
+                createdAt,
+                userId,
+                username,
+                photo,
+                id: doc.id,
+            };
+        })
+        setFeed(feeds); // 얻은 데이터 객체를 setState
+    })
+    
   };
   useEffect(() => {
     fetchFeeds(); // 페칭
