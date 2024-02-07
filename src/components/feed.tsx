@@ -94,6 +94,12 @@ const SubmitBtn = styled.input`
   }
 `;
 
+const CancelBtn = styled.div`
+  width: 100%;
+  text-align: right;
+  cursor: pointer;
+`
+
 
 
 export default function Feed({ username, photo, feed, userId, id }: IFeed) {
@@ -170,14 +176,15 @@ export default function Feed({ username, photo, feed, userId, id }: IFeed) {
               />
               <SubmitBtn
                 type="submit"
-                value={isLoading ? "Posting..." : "Post Feed"}
+                value={isLoading ? "Updating..." : "Update Feed"}
               />
+              <CancelBtn onClick={handleChangeUpdateState}>취소</CancelBtn>
             </Form>
             :
            <Payload>{feed}</Payload>
         }
         
-        {user?.uid === userId ? ( // 작성자만 삭제 버튼이 보이도록
+        {user?.uid === userId && !isUpdating ? ( // 작성자만 삭제 버튼이 보이도록
           <div style={{display: "flex", gap: 4}}>
             <DeleteButton onClick={onDelete}>Delete</DeleteButton>
             <UpdateButton onClick={handleChangeUpdateState}>Update</UpdateButton>
